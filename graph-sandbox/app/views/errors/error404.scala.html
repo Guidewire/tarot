@@ -1,0 +1,12 @@
+@(title:String = "Page Not Found", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.content(title, success, error) {
+  <p>
+    <div style="float: left;">
+      <img src='@routes.Assets.at("images/darth-vader.png")' width="280" height="450" title="Error 404" />
+    </div>
+    <div class="triangle-right left darth" style="float: left; position: relative; left: -80px; top: -20px;">
+      I find your lack of <br /> navigation disturbing.
+    </div>
+  </p>
+}

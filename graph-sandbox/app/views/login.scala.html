@@ -1,0 +1,21 @@
+@(title:String = "Sign in", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm: Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.content(title, success, error) {
+  @if(loginForm.hasErrors) {
+    <script type="text/javascript">
+      alertify.set({ delay: 1000 * 10 });
+      alertify.error("Invalid account or password.<br />Please try again.");
+    </script>
+  }
+
+  <h2>Sign in</h2>
+  <p>
+    @helper.form(routes.Application.authenticate) {
+      <fieldset class="textbox">
+        <input name="account" value="" type="text" autocomplete="on" placeholder="Account" class="text" style="margin-bottom: 6px"><br />
+        <input name="password" value="" type="password" placeholder="Password" class="text" style="margin-bottom: 6px"><br />
+        <input class="submit button" type="submit" value="Sign in" />
+      </fieldset>
+    }
+  </p>
+}

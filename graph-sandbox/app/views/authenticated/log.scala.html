@@ -1,0 +1,330 @@
+@(title:String = "Engine Log", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.tray(title, success, error) {
+  <a target="_top" href="@routes.Authenticated.engine">Summary</a>
+  |
+  <a target="_top" href="@routes.Authenticated.details">Details</a>
+  |
+  <a target="_top" href="@routes.Authenticated.log">Log</a>
+}{
+  <script type="text/javascript">
+
+    var log_uri = "http://{0}:{1}/log";
+    var engine_uri = "http://{0}:{1}/engine";
+
+
+    //Build the URI so it doesn't need to be changed according
+    //to the dev machine being used.
+
+    var host_name = window.location.hostname; //localhost?
+    var host_port = window.location.port - 1; //9000 - 1 = 8999
+
+    log_uri = log_uri.format(host_name, host_port);
+    engine_uri = engine_uri.format(host_name, host_port);
+
+    var pause_log = false;
+
+    //Create a new instance that represents a server sent event
+    //stream. We create one stream that provides data for all the
+    //charts on this page. Different charts should filter for the
+    //kinds of information they're interested in.
+
+    var sse = new ServerSentEvents(
+      engine_uri,
+      function(data) {
+        //Convert the string data to a JSON object.
+        return jQuery.parseJSON(data);
+      }
+    );
+
+    var log_sse = new ServerSentEvents(
+      log_uri,
+      function(data) {
+        //Convert the string data to a JSON object.
+        return jQuery.parseJSON(data);
+      }
+    );
+
+    $(function () {
+      $(document).ready(function() {
+        //Set some charting options.
+        Highcharts.setOptions({
+          global: {
+            useUTC: false
+          }
+        });
+
+        $('#pause').on('click', function(e) {
+          pause_log = !pause_log;
+          if (pause_log)
+            $(this).val('Unpause');
+          else
+            $(this).val('Pause');
+        });
+
+        //Connect to the spray-based server and begin streaming the
+        //data which we'll use to power the charts and logs.
+        sse.begin();
+        log_sse.begin();
+
+        log_sse.addDataReceivedListener(function(data) {
+          //Filter any data that's been received that doesn't
+          //have what we're looking for.
+          if (typeof(data.log) === 'undefined' || pause_log)
+            return;
+
+          var log = data.log;
+
+          var level_class = 'info';
+
+          if (log.levelAsString === 'WARN')
+            level_class = 'warn';
+          else if (log.levelAsString === 'ERROR')
+            level_class = 'error';
+
+          var max_messages = 50;
+          var log_selector = $('#log');
+          var count = log_selector.find('.log-msg').size();
+          var remove = 0;
+
+          if (count > max_messages)
+            remove = count - max_messages;
+
+          log_selector.find('.log-msg:lt('+remove+')').remove();
+          log_selector.append('<div class="log-msg log-' + level_class + '">' + log.message + '</div>');
+
+          log_selector.animate({"scrollTop": log_selector[0].scrollHeight}, 100);
+        });
+      });
+    });
+  </script>
+
+  <script type="text/javascript">
+    $(function () {
+      $('#progress').highcharts({
+        chart: {
+          type: 'gauge',
+          plotBackgroundColor: null,
+          plotBackgroundImage: null,
+          plotBorderWidth: 0,
+          plotShadow: false
+        },
+        title: {
+          text: 'Simulated Annealing'
+        },
+        pane: {
+          startAngle: -150,
+          endAngle: 150,
+          background: [{
+            backgroundColor: {
+              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+              stops: [
+                [0, '#FFF'],
+                [1, '#333']
+              ]
+            },
+            borderWidth: 0,
+            outerRadius: '109%'
+          }, {
+            backgroundColor: {
+              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+              stops: [
+                [0, '#333'],
+                [1, '#FFF']
+              ]
+            },
+            borderWidth: 1,
+            outerRadius: '107%'
+          }, {
+            // default background
+          }, {
+            backgroundColor: '#DDD',
+            borderWidth: 0,
+            outerRadius: '105%',
+            innerRadius: '103%'
+          }]
+        },
+
+        // the value axis
+        yAxis: {
+          min: 0,
+          max: 100,
+
+          minorTickInterval: 'auto',
+          minorTickWidth: 1,
+          minorTickLength: 10,
+          minorTickPosition: 'inside',
+          minorTickColor: '#666',
+
+          tickPixelInterval: 30,
+          tickWidth: 2,
+          tickPosition: 'inside',
+          tickLength: 10,
+          tickColor: '#666',
+          labels: {
+            step: 2,
+            rotation: 'auto'
+          },
+          title: {
+            text: '% Complete'
+          },
+          plotBands: [
+            { from: 0, to: 1, color: '#DF5353' },
+            { from: 1, to: 2, color: '#DD5254' },
+            { from: 2, to: 3, color: '#DB5256' },
+            { from: 3, to: 4, color: '#D95257' },
+            { from: 4, to: 5, color: '#D85259' },
+            { from: 5, to: 6, color: '#D6525B' },
+            { from: 6, to: 7, color: '#D4525C' },
+            { from: 7, to: 8, color: '#D3525E' },
+            { from: 8, to: 9, color: '#D15260' },
+            { from: 9, to: 10, color: '#CF5261' },
+            { from: 10, to: 11, color: '#CE5263' },
+            { from: 11, to: 12, color: '#CC5265' },
+            { from: 12, to: 13, color: '#CA5266' },
+            { from: 13, to: 14, color: '#C95268' },
+            { from: 14, to: 15, color: '#C7526A' },
+            { from: 15, to: 16, color: '#C5526B' },
+            { from: 16, to: 17, color: '#C4526D' },
+            { from: 17, to: 18, color: '#C2526F' },
+            { from: 18, to: 19, color: '#C05270' },
+            { from: 19, to: 20, color: '#BF5272' },
+            { from: 20, to: 21, color: '#BD5274' },
+            { from: 21, to: 22, color: '#BB5275' },
+            { from: 22, to: 23, color: '#BA5277' },
+            { from: 23, to: 24, color: '#B85279' },
+            { from: 24, to: 25, color: '#B6527A' },
+            { from: 25, to: 26, color: '#B5517C' },
+            { from: 26, to: 27, color: '#B3517E' },
+            { from: 27, to: 28, color: '#B1517F' },
+            { from: 28, to: 29, color: '#B05181' },
+            { from: 29, to: 30, color: '#AE5183' },
+            { from: 30, to: 31, color: '#AC5184' },
+            { from: 31, to: 32, color: '#AB5186' },
+            { from: 32, to: 33, color: '#A95188' },
+            { from: 33, to: 34, color: '#A75189' },
+            { from: 34, to: 35, color: '#A5518B' },
+            { from: 35, to: 36, color: '#A4518C' },
+            { from: 36, to: 37, color: '#A2518E' },
+            { from: 37, to: 38, color: '#A05190' },
+            { from: 38, to: 39, color: '#9F5191' },
+            { from: 39, to: 40, color: '#9D5193' },
+            { from: 40, to: 41, color: '#9B5195' },
+            { from: 41, to: 42, color: '#9A5196' },
+            { from: 42, to: 43, color: '#985198' },
+            { from: 43, to: 44, color: '#96519A' },
+            { from: 44, to: 45, color: '#95519B' },
+            { from: 45, to: 46, color: '#93519D' },
+            { from: 46, to: 47, color: '#91519F' },
+            { from: 47, to: 48, color: '#9051A0' },
+            { from: 48, to: 49, color: '#8E51A2' },
+            { from: 49, to: 50, color: '#8C51A4' },
+            { from: 50, to: 51, color: '#8B50A5' },
+            { from: 51, to: 52, color: '#8950A7' },
+            { from: 52, to: 53, color: '#8750A9' },
+            { from: 53, to: 54, color: '#8650AA' },
+            { from: 54, to: 55, color: '#8450AC' },
+            { from: 55, to: 56, color: '#8250AE' },
+            { from: 56, to: 57, color: '#8150AF' },
+            { from: 57, to: 58, color: '#7F50B1' },
+            { from: 58, to: 59, color: '#7D50B3' },
+            { from: 59, to: 60, color: '#7C50B4' },
+            { from: 60, to: 61, color: '#7A50B6' },
+            { from: 61, to: 62, color: '#7850B8' },
+            { from: 62, to: 63, color: '#7750B9' },
+            { from: 63, to: 64, color: '#7550BB' },
+            { from: 64, to: 65, color: '#7350BD' },
+            { from: 65, to: 66, color: '#7250BE' },
+            { from: 66, to: 67, color: '#7050C0' },
+            { from: 67, to: 68, color: '#6E50C1' },
+            { from: 68, to: 69, color: '#6C50C3' },
+            { from: 69, to: 70, color: '#6B50C5' },
+            { from: 70, to: 71, color: '#6950C6' },
+            { from: 71, to: 72, color: '#6750C8' },
+            { from: 72, to: 73, color: '#6650CA' },
+            { from: 73, to: 74, color: '#6450CB' },
+            { from: 74, to: 75, color: '#6250CD' },
+            { from: 75, to: 76, color: '#614FCF' },
+            { from: 76, to: 77, color: '#5F4FD0' },
+            { from: 77, to: 78, color: '#5D4FD2' },
+            { from: 78, to: 79, color: '#5C4FD4' },
+            { from: 79, to: 80, color: '#5A4FD5' },
+            { from: 80, to: 81, color: '#584FD7' },
+            { from: 81, to: 82, color: '#574FD9' },
+            { from: 82, to: 83, color: '#554FDA' },
+            { from: 83, to: 84, color: '#534FDC' },
+            { from: 84, to: 85, color: '#524FDE' },
+            { from: 85, to: 86, color: '#504FDF' },
+            { from: 86, to: 87, color: '#4E4FE1' },
+            { from: 87, to: 88, color: '#4D4FE3' },
+            { from: 88, to: 89, color: '#4B4FE4' },
+            { from: 89, to: 90, color: '#494FE6' },
+            { from: 90, to: 91, color: '#484FE8' },
+            { from: 91, to: 92, color: '#464FE9' },
+            { from: 92, to: 93, color: '#444FEB' },
+            { from: 93, to: 94, color: '#434FED' },
+            { from: 94, to: 95, color: '#414FEE' },
+            { from: 95, to: 96, color: '#3F4FF0' },
+            { from: 96, to: 97, color: '#3E4FF2' },
+            { from: 97, to: 98, color: '#3C4FF3' },
+            { from: 98, to: 99, color: '#3A4FF5' },
+            { from: 99, to: 100, color: '#394FF7' }
+          ]
+        },
+        exporting: {
+          enabled: false
+        },
+        plotOptions: {
+          gauge: {
+            dataLabels: {
+              format: "{y}%"
+            }
+          }
+        },
+        series: [{
+          name: 'Percent Complete',
+          data: [0],
+          tooltip: {
+            valueSuffix: '% complete'
+          }
+        }]
+      },
+
+      //Add some life
+      function (chart) {
+        if (!chart.renderer.forExport) {
+          sse.addDataReceivedListener(function(engine) {
+            //Filter any data that's been received that doesn't
+            //have what we're looking for.
+            if (typeof(engine.progress) === 'undefined')
+              return;
+
+            //If we got this far, then the incoming data is in a
+            //form we can digest.
+
+            var point = chart.series[0].points[0];
+
+            var done = engine.progress.done * 100.0;
+            //done = (done < 100.0) ? done : 0.0;
+
+            done = Math.floor(done * 100.0) / 100.0;
+
+            point.update(done);
+          });
+        }
+      });
+    });
+  </script>
+
+  <table border="0" cellspacing="10" cellpadding="0" width="100%">
+    <tr>
+      <td valign="top"><div id="progress" style="width: 250px; height: 300px;"></div></td>
+      <td><div style="width: 20px;" /></td>
+      <td valign="top" align="center" width="100%">
+        <div class="heading" style="margin-top: 8px; margin-bottom: 15px;">Log</div>
+        <div id="log" class="log" style="margin-bottom: 15px; margin-right: 20px;"></div>
+        <input type="button" id="pause" class="button" value="Pause" />
+      </td>
+    </tr>
+  </table>
+}

@@ -1,0 +1,58 @@
+@(chart: model.DoubleLineChart)
+
+<script type="text/javascript">
+$(function () {
+    $('#@chart.id').highcharts({
+        chart: {
+            type: 'spline',
+            zoomType: 'x'
+        },
+        title: {
+            text: '@chart.model.title'
+        },
+        subtitle: {
+            text: '@chart.model.subtitle'
+        },
+        xAxis: {
+            min: @chart.xMin
+        },
+        yAxis: {
+            min: @chart.yMin
+        },
+        tooltip: {
+            formatter: function() {
+                    return '<b>'+ this.series.name +'</b><br /><b>X</b>: ' + this.x + '<br /><b>Y</b>: ' + this.y;
+            }
+        },
+        plotOptions: {
+            spline: {
+                lineWidth: 1,
+                states: {
+                    hover: {
+                        lineWidth: 2
+                    }
+                },
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+
+        series: [
+            @for(series <- chart.model.series) {
+                {
+                    name: '@series.title',
+                    data: [
+                        @for((x,y) <- series.pairs) {
+                            [@x, @y],
+                        }
+                    ]
+                },
+            }
+        ]
+    });
+});
+
+
+</script>
+<div id="@chart.id" style="min-width: 300px; height: 400px; margin: 0 auto"></div>

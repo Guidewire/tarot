@@ -1,0 +1,53 @@
+@(title:String = "The Team", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.content(title, success, error) {
+  <h2>The Team</h2>
+  <p />
+
+  <h4>Jason Cramer</h4>
+  <table border="0" cellspacing="1" cellpadding="0">
+    <tr>
+      <td valign="top">
+        <p>
+          I'm an Electrical Engineering and Computer Sciences major, focusing on software engineering
+          and signal processing. Though I go to school and will be working in California, I hail from
+          Delaware. I really enjoy programming/hacking, and I find machine learning, computer vision,
+          sound processing, and music programming especially interesting. I like going to the hackathons
+          put on by my school and working on personal projects. Aside from hacking and learning, I enjoy
+          watching cartoons, listening to lots of music, and playing piano and guitar (and drums
+          occasionally).
+        </p>
+      </td>
+      <td valign="top">
+        <div class="frame" style="margin-top: 10px; margin-left: 30px; margin-right: 30px;">
+          <img src='@routes.Assets.at("images/team/jcramer.jpg")' />
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <h4>Kelvin Li</h4>
+  <table border="0" cellspacing="1" cellpadding="0">
+    <tr>
+      <td valign="top">
+        <p>
+          I am studying bioengineering (and intend to double in EECS) at UC Berkeley. I have a random*
+          assortment of geeky interests:
+          <ul style="margin-left: 30px;">
+            <li>Python and Linux bigot</li>
+            <li>Irregularly post stuff to <a href="https://github.com/kelvinli/" target="_top">github.com/KelvinLi</a></li>
+            <li>Love a challenging math problem</li>
+            <li>Corollary: have always been fascinated by, but never understood, AI and machine learning</li>
+          </ul>
+          <br />
+          * well, maybe not so random: <a href="http://xkcd.com/1210/" target="_top">xkcd.com/1210</a>
+        </p>
+      </td>
+      <td valign="top">
+        <div class="frame" style="margin-top: 10px; margin-left: 30px; margin-right: 30px;">
+          <img src='@routes.Assets.at("images/team/kli.jpg")' />
+        </div>
+      </td>
+    </tr>
+  </table>
+}

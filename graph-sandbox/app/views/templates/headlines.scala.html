@@ -1,0 +1,11 @@
+@(title:String = "", success:Seq[String] = Seq(), error:Seq[String] = Seq())(headlines:Html)(content:Html)(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.main(title, success, error) {
+  <div class="headlines">
+    @headlines
+  </div>
+  <div class="content">
+    @content
+    <div class="break"></div>
+  </div>
+}

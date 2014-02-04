@@ -1,0 +1,8 @@
+@(title:String = "Terms", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.content(title, success, error) {
+  <h2>Terms of Use &amp; Privacy Policy</h2>
+  <p>
+    ...
+  </p>
+}

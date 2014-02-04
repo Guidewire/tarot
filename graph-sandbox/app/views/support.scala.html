@@ -1,0 +1,10 @@
+@(title:String = "Support", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.content(title, success, error) {
+  <h2>Support</h2>
+  <p>
+    Please email
+    <a href="mailto:tarot@@guidewire.com?subject=Help" target="_top">tarot@@guidewire.com</a>
+    for feedback, support, and help with any issue you're facing.
+  </p>
+}
