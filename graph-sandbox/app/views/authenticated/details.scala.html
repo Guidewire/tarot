@@ -1,0 +1,254 @@
+@(title:String = "Engine Details", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.tray(title, success, error) {
+  <a target="_top" href="@routes.Authenticated.engine">Summary</a>
+  |
+  <a target="_top" href="@routes.Authenticated.details">Details</a>
+  |
+  <a target="_top" href="@routes.Authenticated.log">Log</a>
+}{
+  <script type="text/javascript">
+
+
+    var engine_uri = "http://{0}:{1}/engine";
+    var configuration_uri = "http://{0}:{1}/configuration";
+
+
+    //Build the URI so it doesn't need to be changed according
+    //to the dev machine being used.
+
+    var host_name = window.location.hostname; //localhost?
+    var host_port = window.location.port - 1; //9000 - 1 = 8999
+
+    engine_uri = engine_uri.format(host_name, host_port);
+    configuration_uri = configuration_uri.format(host_name, host_port);
+
+    //Create a new instance that represents a server sent event
+    //stream. We create one stream that provides data for all the
+    //charts on this page. Different charts should filter for the
+    //kinds of information they're interested in.
+
+    var sse = new ServerSentEvents(
+      engine_uri,
+      function(data) {
+        //Convert the string data to a JSON object.
+        return jQuery.parseJSON(data);
+      }
+    );
+
+    $(function () {
+      $(document).ready(function() {
+        //Set some charting options.
+        Highcharts.setOptions({
+          global: {
+            useUTC: false
+          }
+        });
+
+        //Connect to the spray-based server and begin streaming the
+        //data which we'll use to power the charts.
+        sse.begin();
+
+        //Ask for configuration info. from the server.
+        $.ajax({
+          url: configuration_uri,
+          type: 'get',
+          dataType: 'json',
+          success: function(data) {
+            init(data);
+          }
+        });
+      });
+    });
+
+    function init(config) {
+      var suite_kinds = config.engine.suiteKinds;
+      var machine_kinds = config.engine.machineKinds;
+
+      for(var i = 0; i < machine_kinds.length; ++i) {
+        var machine_kind = machine_kinds[i];
+        var compatible = machine_kind.compatibleSuiteKinds;
+        var machine_suite_kinds = new Array();
+
+        //Lookup it's associated suite kind.
+        for(var j = 0; j < compatible.length; ++j) {
+          for(var k = 0; k < suite_kinds.length; ++k) {
+            if (compatible[j] === suite_kinds[k].id) {
+              machine_suite_kinds[j] = suite_kinds[k];
+              break;
+            }
+          }
+        }
+
+        createNewMachineChart(machine_kind.id, machine_kind.title, machine_suite_kinds);
+      }
+    };
+  </script>
+
+  <script type="text/javascript">
+    function produceSeries(title, axis, extra) {
+      return {
+        name: title,
+        yAxis: axis,
+        extra: extra,
+        data: (function() {
+          //Generate an array of data points that will be initialized to 0
+          //and will eventually drop off after additional points replace
+          //them.
+
+          var data = [],
+              time = (new Date()).getTime(),
+              i;
+
+          for (i = -49; i <= 0; i++) {
+            data.push({
+              x: time + i * 1000,
+              y: 0
+            });
+          }
+          return data;
+        })()
+      };
+    }
+
+    function createNewMachineChart(machine_kind_id, machine_kind_title, suite_kinds) {
+      //Create an array of series
+      var chart_series = new Array();
+
+      chart_series[0] = produceSeries('Machine Count', 1, machine_kind_id);
+
+      for(var i = 0; i < suite_kinds.length; ++i) {
+        chart_series[i + 1] = produceSeries(suite_kinds[i].title, 0, suite_kinds[i]);
+      }
+
+      jQuery('<div />', {
+        id: 'div_' + machine_kind_id,
+        class: 'graph',
+        style: 'width: 95%; height: 350px;'
+      })
+      .addClass("graph")
+      .appendTo('#machine_kind_charts')
+      .highcharts({
+        chart: {
+          type: 'spline',
+          animation: Highcharts.svg, //Don't animate in old IE
+          marginRight: 10,
+          events: {
+            load: function() {
+              var chart = this;
+              var machine_count_series = this.series[0];
+              var suite_count_series = this.series.slice(1);
+
+              var processMachines = function(x, machine_kind_status) {
+                var y = machine_kind_status.count;
+                machine_count_series.addPoint([x, y], false, true);
+              };
+
+              var processQueue = function(x, suite_kind_statuses) {
+                for(var i = 0; i < suite_kind_statuses.length; ++i) {
+                  var suite_kind_status = suite_kind_statuses[i];
+
+                  //Find the series that corresponds to this suite kind.
+                  var suite_kind_series = null;
+                  for(var j = 0; j < suite_count_series.length; ++j) {
+                    if (suite_count_series[j].options.extra.id === suite_kind_status.id) {
+                      suite_kind_series = suite_count_series[j];
+                      break;
+                    }
+                  }
+
+                  if (suite_kind_series != null) {
+                    var y = suite_kind_status.size;
+                    suite_kind_series.addPoint([x, y], false, true);
+                  }
+                }
+              };
+
+              //Updates the chart every time new data is sent from
+              //the server.
+
+              sse.addDataReceivedListener(function(engine) {
+                //Filter any data that's been received that doesn't
+                //have what we're looking for.
+                if (typeof(engine.queue) !== 'undefined') {
+                  for(var i = 0; i < engine.queue.machineKindStatus.length; ++i) {
+                    if (engine.queue.machineKindStatus[i].id === machine_kind_id) {
+                      processQueue((new Date()).getTime(), engine.queue.machineKindStatus[i].suiteKindStatus);
+                      break;
+                    }
+                  }
+                  chart.redraw();
+                } else if (typeof(engine.machines) !== 'undefined') {
+                  for(var i = 0; i < engine.machines.machineKindStatus.length; ++i) {
+                    if (engine.machines.machineKindStatus[i].id === machine_kind_id) {
+                      processMachines((new Date()).getTime(), engine.machines.machineKindStatus[i]);
+                      break;
+                    }
+                  }
+                  chart.redraw();
+                }
+              });
+            }
+          }
+        },
+        title: {
+          text: machine_kind_title
+        },
+        xAxis: {
+          type: 'datetime',
+          tickPixelInterval: 100
+        },
+        yAxis: [
+          {
+            min: 0,
+            title: {
+              text: 'Suite Queue Size'
+            },
+            plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#808080'
+            }]
+          }, {
+            min: 0,
+            title: {
+              text: 'Machine Count'
+            },
+            opposite: false
+          }],
+        tooltip: {
+          formatter: function() {
+            return '<b>'+ this.series.name +'</b><br/>'+
+            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+            Highcharts.numberFormat(this.y, 0);
+          }
+        },
+        legend: {
+          layout: 'vertical'
+        },
+        plotOptions: {
+          spline: {
+            lineWidth: 2,
+            states: {
+              hover: {
+                lineWidth: 3
+              }
+            },
+            marker: {
+              enabled: false
+            }
+          }
+        },
+        legend: {
+          enabled: true
+        },
+        exporting: {
+          enabled: false
+        },
+        series: chart_series
+      });
+    };
+  </script>
+
+  <div id="machine_kind_charts" />
+}

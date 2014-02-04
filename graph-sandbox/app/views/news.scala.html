@@ -1,0 +1,20 @@
+@(title:String = "News", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.content(title, success, error) {
+  <h2>News</h2>
+  <p />
+  <h4>Catch up with the latest on Tarot</h4>
+  <p>
+    If you're curious about what's going on with Tarot, here you are:
+  </p>
+  <div class="news">
+    <div class="box">1</div>
+    <div class="item vertical-line-left">
+      <h3>Project Demo, July 23, 2013</h3>
+      Jason and Kelvin provided the first live demo of Tarot to other interns and mentors. We
+      faced some trouble tweaking the code just before the demo but it worked out well enough
+      to show that we've been working hard!
+    </div>
+    <div class="break"></div>
+  </div>
+}

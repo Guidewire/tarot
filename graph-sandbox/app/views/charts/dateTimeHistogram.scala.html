@@ -1,0 +1,62 @@
+@(chart: model.DateTimeHistogramChart)
+
+<script type="text/javascript">
+$(function () {
+    $('#@chart.id').highcharts({
+        chart: {
+            type: 'spline',
+            zoomType: 'x'
+        },
+        title: {
+            text: '@chart.model.title'
+        },
+        subtitle: {
+            text: '@chart.model.subtitle'
+        },
+        xAxis: {
+            type: 'datetime'
+        },
+        yAxis: {
+            title: {
+                text: 'Count'
+            },
+            min: 0
+        },
+        tooltip: {
+            formatter: function() {
+                    return '<b>'+ this.series.name +'</b><br/>'+
+                    Highcharts.dateFormat('%Y-%m-%d', this.x) +': '+ this.y;
+            }
+        },
+        plotOptions: {
+            spline: {
+                lineWidth: 2,
+                states: {
+                    hover: {
+                        lineWidth: 3
+                    }
+                },
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+
+        series: [
+            @for(series <- chart.model.series) {
+                {
+                    name: '@series.title',
+                    data: [
+                        @for((d,count) <- series.pairs) {
+                            [Date.UTC(@d.getYear, @{d.getMonthOfYear - 1}, @d.getDayOfMonth, @d.getHourOfDay, @d.getMinuteOfHour, @d.getSecondOfMinute), @count],
+                        }
+                    ]
+                },
+            }
+        ]
+    });
+});
+
+
+</script>
+<div id="@chart.id" style="min-width: 300px; height: 400px; margin: 0 auto"></div>

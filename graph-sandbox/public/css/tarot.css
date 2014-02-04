@@ -1,0 +1,613 @@
+body {
+  overflow-y: scroll;
+  overflow-x: auto;
+  font-size: 10px;
+  font-family: Arial,Helvetica,sans-serif;
+  background-image: none;
+  background-size: cover;
+  background-color: rgb(212, 214, 215);
+}
+
+.graph {
+  padding: 30px;
+}
+
+.header {
+}
+
+.headerBackground {
+  margin-top: 20px;
+  margin-bottom: 30px;
+  background-color: rgba(99, 103, 105, 0.180392);
+  border-top: 0px solid rgb(212, 214, 215);
+  border-bottom: 0px solid rgb(212, 214, 215);
+
+  background-image: url(/static/images/tarot-transparent.png);
+  background-repeat: no-repeat;
+  background-position: top right;
+  background-size:200px 198px;
+}
+
+.headerAccount {
+  line-height: 1.4em;
+  font: normal normal normal 14px/1.4em 'Open Sans', sans-serif;
+  color: rgb(1, 21, 59);
+  text-align: right;
+  padding-right: 20px;
+  padding-top: 10px;
+}
+
+.headerContent {
+  padding-top: 20px;
+  padding-bottom: 24px;
+  width: 930px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.header h1 {
+  font: normal normal normal 49px/1.4em Enriqueta, serif;
+  color: rgb(99, 103, 105);
+
+}
+
+.header a, .header a:hover {
+  text-decoration: none;
+}
+
+.header h6 {
+  padding-left: 78px;
+  line-height: 1.4em;
+  color: rgb(1, 21, 59);
+  font: normal normal normal 17px/1.4em Play, sans-serif;
+}
+
+.headerIcon {
+  padding-top:10px;
+  padding-right: 5px;
+  float: left;
+}
+
+.tray {
+  position: relative;
+  top: -30px;
+  height: 30px;
+  line-height: 1.4em;
+  color: rgb(1, 21, 59);
+  font: normal normal normal 14px/1.4em Play, sans-serif;
+  background: rgba(12, 28, 36, 0.180392);
+}
+
+.tray .inner {
+  padding-top: 6px;
+  padding-left: 150px;
+  width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tray .inner a {
+  color: rgb(1, 21, 59);
+  text-decoration: none;
+}
+
+.tray .inner a, .tray .inner a:visited {
+  color: rgb(1, 21, 59);
+  text-decoration: none;
+}
+
+.tray .inner a:hover {
+  color: rgb(3, 64, 178);
+  text-decoration: none;
+}
+
+.headlines {
+  background-color: rgb(29, 83, 119);
+  border-top: 0px solid rgb(29, 83, 119);
+  border-bottom: 0px solid rgb(29, 83, 119);
+  padding-top: 35px;
+  padding-bottom: 33px;
+}
+
+.headlines .tag {
+  width: 930px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.headlines .tag .body {
+  width: 310px;
+  float: left;
+  padding-top: 4px;
+}
+
+.headlines .tag h4 {
+  font: normal normal normal 37px/1.4em Enriqueta, serif;
+  color: #d4d6d7;
+  margin-bottom: 15px;
+}
+
+.headlines .tag .body p {
+  color: rgb(212, 214, 215);
+  font: normal normal normal 12px/1.4em 'Open Sans', sans-serif;
+  line-height: 1.4em;
+  text-align: justify;
+}
+
+.headlines .tag .splash {
+  float: left;
+  padding-left: 105px;
+  padding-right: 0px;
+  padding-top: 0px;
+}
+
+.button, .button:visited {
+  text-decoration: none;
+  cursor: pointer;
+  background-color: rgb(255, 140, 0);
+  transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+  -webkit-transition-property: border-color, background-color;
+  -webkit-transition-duration: 0.4s, 0.4s;
+  -webkit-transition-timing-function: ease, ease;
+  -webkit-transition-delay: 0s, 0s;
+  box-shadow: rgba(0, 0, 0, 0.6) 0px 1px 4px 0px;
+  border: 0px solid rgb(24, 26, 28);
+
+  line-height: 1.4em;
+  font: normal normal normal 14px/1.4em 'Open Sans', sans-serif;
+  white-space: nowrap;
+  margin: 0px;
+  display: inline-block;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+  color: white;
+}
+
+.button:hover {
+  text-decoration: none;
+  color: white;
+  background-color: rgb(14, 41, 59);
+  border-color: rgb(24, 26, 28);
+  transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+  -webkit-transition-property: border-color, background-color;
+  -webkit-transition-duration: 0.4s, 0.4s;
+  -webkit-transition-timing-function: ease, ease;
+  -webkit-transition-delay: 0s, 0s;
+}
+
+.button-large {
+  font: normal normal normal 26px/1.4em 'Open Sans', sans-serif !important;
+}
+
+.submit {
+  text-decoration: none;
+  cursor: pointer;
+  background-color: rgb(255, 140, 0);
+  transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+  -webkit-transition-property: border-color, background-color;
+  -webkit-transition-duration: 0.4s, 0.4s;
+  -webkit-transition-timing-function: ease, ease;
+  -webkit-transition-delay: 0s, 0s;
+  box-shadow: rgba(0, 0, 0, 0.6) 0px 1px 4px 0px;
+  border: 0px solid rgb(24, 26, 28);
+
+  line-height: 1.4em;
+  font: normal normal normal 14px/1.4em 'Open Sans', sans-serif;
+  white-space: nowrap;
+  color: white;
+}
+
+.submit:hover {
+  text-decoration: none;
+  color: white;
+  background-color: rgb(14, 41, 59);
+  border-color: rgb(24, 26, 28);
+  transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+  -webkit-transition-property: border-color, background-color;
+  -webkit-transition-duration: 0.4s, 0.4s;
+  -webkit-transition-timing-function: ease, ease;
+  -webkit-transition-delay: 0s, 0s;
+}
+
+.content {
+  width: 930px;
+  margin-left: auto;
+  margin-right: auto;
+
+  line-height: 1.4em;
+  font: normal normal normal 14px/1.4em 'Open Sans', sans-serif;
+  color: rgb(1, 21, 59);
+}
+
+.content .insert {
+  margin-left: 80px;
+  margin-right: 80px;
+  margin-top: 30px;
+}
+
+.content .insert .splash {
+  width: 170px;
+  padding-right: 10px;
+  float: left;
+}
+
+.content .insert .body {
+  float: left;
+  padding-left: 10px;
+}
+
+.content .insert .body h4 {
+  font-weight: bold;
+}
+
+.content .insert .body p {
+  text-align: justify;
+}
+
+.content .normal {
+  min-height: 500px;
+}
+
+.content .normal h2 {
+  line-height: 1.4em;
+  font: normal normal normal 33px/1.4em Enriqueta, serif;
+  color: rgb(1, 21, 59);
+  border-bottom: 1px solid rgb(1, 21, 59);
+}
+
+.content .normal h4 {
+  line-height: 1.4em;
+  font: normal normal normal 17px/1.4em 'Open Sans', sans-serif;
+  color: rgb(1, 21, 59);
+}
+
+.content .normal p {
+  text-align: justify;
+}
+
+.content .frame {
+  box-shadow: rgba(0, 0, 0, 0.6) 0px 1px 4px 0px;
+  border: 0px solid rgb(24, 26, 28);
+  -webkit-background-clip: border-box;
+  -webkit-background-origin: padding-box;
+  -webkit-background-size: auto;
+  background-attachment: scroll;
+  background-clip: border-box;
+  background-color: rgb(29, 83, 119);
+  background-image: none;
+  background-origin: padding-box;
+  background-size: auto;
+  border: 1px solid rgb(24, 26, 28);
+  padding: 10px;
+}
+
+.content .news .box {
+  width: 75px;
+  height: 75px;
+  background-color: rgba(255, 255, 255, 0.219608);
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.6) 0px 1px 4px 0px;
+  border: 0px solid rgb(24, 26, 28);
+  word-wrap: break-word;
+  font: normal normal normal 63px/1.4em Play, sans-serif;
+  color: rgb(1, 21, 59);
+  line-height: 75px;
+  text-align: right;
+  float: left;
+  margin-left: 0px;
+  margin-right: 20px;
+}
+
+.content .news .item {
+  float: left;
+  width: 800px;
+  padding-left: 20px;
+  margin-bottom: 30px;
+}
+
+.content .news .item h3 {
+  font: normal normal normal 25px/1.4em Enriqueta, serif;
+  color: rgb(1, 21, 59);
+}
+
+.charts {
+  width: 100%;
+}
+
+.footer {
+  background-color: rgba(99, 103, 105, 0.180392);
+  border-top: 0px solid rgb(212, 214, 215);
+  border-bottom: 0px solid rgb(212, 214, 215);
+
+  margin-top: 30px;
+
+  position: absolute;
+  left: 0px;
+  width: 100%;
+}
+
+.footerContent {
+  padding-top: 20px;
+  padding-bottom: 14px;
+  width: 930px;
+  margin-left: auto;
+  margin-right: auto;
+
+  line-height: 1.4em;
+  font: normal normal normal 12px/1.4em 'Open Sans', sans-serif;
+  color: rgb(1, 21, 59);
+}
+
+.footerColumn {
+  float: left;
+  width: 200px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.footer a, .footer a:visited {
+  text-decoration: none;
+  cursor: pointer;
+
+  padding-left: 5px;
+  height: 50px;
+
+  font: normal normal normal 12px/1.4em 'Open Sans', sans-serif;
+  color: rgb(49, 53, 56);
+  white-space: nowrap;
+  transition: color 0.4s ease 0s;
+  -webkit-transition-property: color;
+  -webkit-transition-duration: 0.4s;
+  -webkit-transition-timing-function: ease;
+  -webkit-transition-delay: 0s;
+}
+
+.footer a:hover {
+  text-decoration: none;
+  color: rgb(3, 64, 178);
+  transition: color 0.4s ease 0s;
+  -webkit-transition-property: color;
+  -webkit-transition-duration: 0.4s;
+  -webkit-transition-timing-function: ease;
+  -webkit-transition-delay: 0s;
+}
+
+.footer .line {
+  height: 3px;
+  background-color: white;
+}
+
+.footer .footerColumn .footerLink {
+  margin-top: 10px;
+  margin-bottom: 13px;
+}
+
+.footer .footerColumn .line {
+  width: 140px;
+}
+
+.footerCopyright {
+  margin-top: 20px;
+  padding-left: 20px;
+}
+
+.vertical-line-left {
+  border-left: 1px dotted rgb(49, 53, 56);
+}
+
+.vertical-line-right {
+  border-right: 1px dotted rgb(49, 53, 56);
+}
+
+.clear {
+  overflow: auto;
+  width: 100%;
+}
+
+.break {
+  clear: both;
+}
+
+img {
+  border: none;
+}
+
+a, a:visited {
+  text-decoration: none;
+  color: darkblue;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: darkblue;
+}
+
+.alertify-log-error {
+  background: rgba(177, 40, 40, 0.54);
+  font: normal normal normal 14px/1.4em Play, sans-serif;
+}
+
+.alertify-log-success {
+  background: rgba(116, 211, 39, 0.56);
+  font: normal normal normal 14px/1.4em Play, sans-serif;
+}
+
+.alertify-message {
+  font: normal normal normal 14px/1.4em Play, sans-serif;
+}
+
+.alertify-logs {
+  top: 22px;
+  right: 10px;
+}
+
+.text {
+  border-bottom: 1px solid rgb(1, 21, 59);
+  border-left: 1px solid rgb(1, 21, 59);
+  border-right: 1px solid rgb(1, 21, 59);
+  border-top: 1px solid rgb(1, 21, 59);
+  border-radius: 3px 3px 3px 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  font: normal normal normal 14px/1.4em Play, sans-serif;
+  padding: 6px 6px 4px;
+  color: rgb(1, 21, 59);
+  background: rgba(238, 238, 238, 0.86);
+}
+
+.spinner {
+  font: normal normal normal 14px/1.4em Play, sans-serif !important;
+  color: #666;
+}
+
+.ui-spinner {
+  background: rgba(238, 238, 238, 0.86) !important;
+  border-bottom: 1px solid rgb(1, 21, 59);
+  border-left: 1px solid rgb(1, 21, 59);
+  border-right: 1px solid rgb(1, 21, 59);
+  border-top: 1px solid rgb(1, 21, 59);
+  border-radius: 3px 3px 3px 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+
+.ui-spinner .ui-state-default {
+  border: none !important;
+  background: none !important;
+}
+
+.ui-spinner .ui-state-hover {
+}
+
+.darth {
+  font: normal normal normal 34px/1.4em Play, sans-serif;
+  color: white;
+}
+
+.triangle-right {
+	position:relative;
+	padding:15px;
+	margin:1em 0 3em;
+	color:#fff;
+	background:rgba(77, 79, 82, 0.88); /* default background for browsers without gradient support */
+	-webkit-border-radius:10px;
+	-moz-border-radius:10px;
+	border-radius:10px;
+}
+
+.triangle-right.left {
+	margin-left:40px;
+	background:rgba(77, 79, 82, 0.88);
+}
+
+.triangle-right:after {
+	content:"";
+	position:absolute;
+	bottom:-20px; /* value = - border-top-width - border-bottom-width */
+	left:50px; /* controls horizontal position */
+	border-width:20px 0 0 20px; /* vary these values to change the angle of the vertex */
+	border-style:solid;
+    /* reduce the damage in FF3.0 */
+    display:block;
+    width:0;
+}
+
+.triangle-right.left:after {
+	top:16px;
+	left:-40px; /* value = - border-left-width - border-right-width */
+	bottom:auto;
+	border-width:15px 40px 0 0; /* vary these values to change the angle of the vertex */
+	border-color:transparent rgba(77, 79, 82, 0.88);
+}
+
+.log {
+  border: none;
+  height: 400px;
+  min-width: 400px;
+  overflow-x: auto;
+  overflow-y: auto;
+  margin-bottom:10px;
+  font-size:8pt;
+  font-family: monospace;
+}
+
+.heading {
+  color: rgb(1, 21, 59);
+  font: normal normal normal 17px/1.4em Play, sans-serif;
+}
+
+.log-msg {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  margin-right: 4px;
+}
+
+.log-info {
+  background: rgba(116, 211, 39, 0.38);
+  border: 1px solid rgba(105, 192, 35, 0.88);
+}
+
+.log-warn {
+  background: rgba(247, 252, 131, 0.38);
+  border: 1px solid rgba(192, 197, 79, 0.68);
+}
+
+.log-error {
+  background: rgba(192, 96, 96, 0.36);
+  border: 1px solid rgba(187, 72, 72, 0.49);
+}
+
+@font-face {
+  font-family: 'Enriqueta';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Enriqueta-Regular'), url(http://themes.googleusercontent.com/static/fonts/enriqueta/v2/-KTKVm0Mx9ZCRXL9CXVIbT8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+@font-face {
+  font-family: 'Enriqueta';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Enriqueta-Bold'), url(http://themes.googleusercontent.com/static/fonts/enriqueta/v2/I27Pb-wEGH2ajLYP0QrtSHhCUOGz7vYGh680lGh-uXM.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Open Sans Italic'), local('OpenSans-Italic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBobN6UDyHWBl620a-IRfuBk.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 700;
+  src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxjqR_3kx9_hJXbbyU8S6IN0.woff) format('woff');
+}
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Play'), url(http://themes.googleusercontent.com/static/fonts/play/v3/-SXnV4mZjf4oh1IBw13WZw.woff) format('woff');
+}
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Play-Bold'), url(http://themes.googleusercontent.com/static/fonts/play/v3/ZzUearZLklGfoL18Ti0GaQ.woff) format('woff');
+}

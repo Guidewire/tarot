@@ -1,0 +1,39 @@
+@(title:String = "Home", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.headlines(title, success, error) {
+  <div class="tag">
+    <div class="body">
+      <h4>Adjust resources predictively</h4>
+      <p>
+        Large-scale testing infrastructure needs fluctuate on a daily basis and according to
+        use, commits, and scheduled runs. Running atop bare metal makes it difficult to respond
+        to these changing needs.
+      </p>
+      <p>
+        Read on to discover how Project Tarot solves this complex problem by exploring resource
+        allocation plans and selecting one that will yield the best gains given your hardware
+        environment.
+      </p>
+      <a class="button" href="@routes.Application.predictive" target="_top">READ MORE</a>
+    </div>
+    <div class="splash">
+      <img src='@routes.Assets.at("images/adjust-resources-predictively.png")' />
+    </div>
+    <div class="break"></div>
+  </div>
+} {
+  <div class="insert">
+    <!--
+    <div class="splash vertical-line-right">
+      <img src='@routes.Assets.at("images/icon-computer.png")' />
+    </div>
+    <div class="body">
+      <h4>Trend Analysis</h4>
+      <p>
+        Tarot continually analyzes current trends and responds accordingly.
+      </p>
+    </div>
+    -->
+    <div class="break"></div>
+  </div>
+}

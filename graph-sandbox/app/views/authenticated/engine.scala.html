@@ -1,0 +1,430 @@
+@(title:String = "Engine Summary", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.tray(title, success, error) {
+  <a target="_top" href="@routes.Authenticated.engine">Summary</a>
+  |
+  <a target="_top" href="@routes.Authenticated.details">Details</a>
+  |
+  <a target="_top" href="@routes.Authenticated.log">Log</a>
+}{
+  <script type="text/javascript">
+
+
+    var engine_uri = "http://{0}:{1}/engine";
+    var simulator_uri = "http://{0}:{1}/simulator";
+
+
+    //Build the URI so it doesn't need to be changed according
+    //to the dev machine being used.
+
+    var host_name = window.location.hostname; //localhost?
+    var host_port = window.location.port - 1; //9000 - 1 = 8999
+
+    engine_uri = engine_uri.format(host_name, host_port);
+    simulator_uri = simulator_uri.format(host_name, host_port);
+
+    //Create a new instance that represents a server sent event
+    //stream. We create one stream that provides data for all the
+    //charts on this page. Different charts should filter for the
+    //kinds of information they're interested in.
+
+    var sse = new ServerSentEvents(
+      engine_uri,
+      function(data) {
+        //Convert the string data to a JSON object.
+        return jQuery.parseJSON(data);
+      }
+    );
+
+    $(function () {
+      $(document).ready(function() {
+        //Set some charting options.
+        Highcharts.setOptions({
+          global: {
+            useUTC: false
+          }
+        });
+
+        //Setup suite kind selector.
+        $('#selectSuiteKind').chosen({
+          '.chosen-select'           : {},
+          '.chosen-select-deselect'  : {allow_single_deselect:true},
+          '.chosen-select-no-single' : {disable_search_threshold:10},
+          '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+          '.chosen-select-width'     : {width:"95%"}
+        });
+
+        //Setup spinner.
+        var numSuitesSpinner = $('#numSuites').spinner({
+          min: 0,
+          max: 300,
+          step: 10,
+          start: 10
+        });
+
+        //Add handler for adding suites.
+        $('#addSuites').on('click', addSuites);
+
+        //Connect to the spray-based server and begin streaming the
+        //data which we'll use to power the charts.
+        sse.begin();
+      });
+    });
+  </script>
+
+  <div style="position: fixed; right: 30px; bottom: 30px; border: 1px solid rgba(78, 78, 78, 0.8); z-index: 6000; background: rgba(126, 126, 126, 0.76); padding: 15px; border-radius: 10px;">
+    <div style="padding-bottom: 15px;">
+      <select id="selectSuiteKind" data-placeholder="Select a suite type" style="width: 200px;" multiple="multiple">
+        <option value="" />
+        <option value="Tomcat 7, H2">Tomcat 7, H2</option>
+        <option value="JBoss 6, H2">JBoss 6, H2</option>
+      </select>
+    </div>
+    <input id="numSuites" type="text" name="numSuites" class="spinner" style="width: 170px;" placeholder="Suites to add">
+    <div style="padding-top: 15px;">
+      <div style="width: 80px; margin: 0 auto;">
+       <button id="addSuites" class="button" style="width: 80px;">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="machineCount" class="graph" style="width: 95%; height: 350px;"></div>
+  <div id="queueSize" class="graph" style="width: 95%; height: 350px;"></div>
+  <div id="queueRate" class="graph" style="width: 95%; height: 350px;"></div>
+
+  <script type="text/javascript">
+    function addSuites() {
+      var suiteKinds = $('#selectSuiteKind').chosen().val();
+      var numSuites = parseInt($('#numSuites').spinner().val());
+
+      if (suiteKinds == null) {
+        suiteKinds = []
+      }
+
+      if (isNaN(numSuites)) {
+        alertify.error("Invalid number");
+      } else {
+        var suiteJSON = { kinds: suiteKinds, suites: numSuites };
+
+        $.ajax({
+          url: simulator_uri,
+          data: JSON.stringify(suiteJSON),
+          type: 'post',
+          dataType: 'json',
+          contentType: 'application/json',
+          success: function(data) {
+            if (data.success) {
+              alertify.success(data.message);
+            } else {
+              alertify.error(data.message);
+            }
+          }
+        });
+      }
+    }
+  </script>
+
+  <script type="text/javascript">
+    $(function () {
+      $(document).ready(function() {
+        $('#queueRate').highcharts({
+          chart: {
+            type: 'spline',
+            animation: Highcharts.svg, //Don't animate in old IE
+            marginRight: 10,
+            events: {
+              load: function() {
+                var series = this.series[0];
+
+                //Updates the chart every time new data is sent from
+                //the server.
+
+                sse.addDataReceivedListener(function(engine) {
+                  //Filter any data that's been received that doesn't
+                  //have what we're looking for.
+                  if (typeof(engine.queue) === 'undefined')
+                    return;
+
+                  //If we got this far, then the incoming data is in a
+                  //form we can digest.
+
+                  var x = (new Date()).getTime(); //Current time
+                  var y = engine.queue.rate;
+
+                  series.addPoint([x, y], true, true);
+                });
+              }
+            }
+          },
+          title: {
+            text: 'Incoming Suite Rate'
+          },
+          xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 100
+          },
+          yAxis: {
+            title: {
+              text: 'Suites per second'
+            },
+            min: 0,
+            plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#808080'
+            }]
+          },
+          tooltip: {
+            formatter: function() {
+              return '<b>'+ this.series.name +'</b><br/>'+
+              Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+              Highcharts.numberFormat(this.y, 0);
+            }
+          },
+          plotOptions: {
+            spline: {
+              lineWidth: 2,
+              states: {
+                hover: {
+                  lineWidth: 3
+                }
+              },
+              marker: {
+                enabled: false
+              }
+            }
+          },
+          legend: {
+            enabled: false
+          },
+          exporting: {
+            enabled: false
+          },
+          series: [{
+            name: 'Incoming Suite Rate',
+            data: (function() {
+              //Generate an array of data points that will be initialized to 0
+              //and will eventually drop off after additional points replace
+              //them.
+
+              var data = [],
+                  time = (new Date()).getTime(),
+                  i;
+
+              for (i = -49; i <= 0; i++) {
+                data.push({
+                  x: time + i * 1000,
+                  y: 0
+                });
+              }
+              return data;
+            })()
+          }]
+        });
+      });
+    });
+  </script>
+
+  <script type="text/javascript">
+    $(function () {
+      $(document).ready(function() {
+        $('#queueSize').highcharts({
+          chart: {
+            type: 'spline',
+            animation: Highcharts.svg, //Don't animate in old IE
+            marginRight: 10,
+            events: {
+              load: function() {
+                var series = this.series[0];
+
+                //Updates the chart every time new data is sent from
+                //the server.
+
+                sse.addDataReceivedListener(function(engine) {
+                  //Filter any data that's been received that doesn't
+                  //have what we're looking for.
+                  if (typeof(engine.queue) === 'undefined')
+                    return;
+
+                  //If we got this far, then the incoming data is in a
+                  //form we can digest.
+
+                  var x = (new Date()).getTime(); //Current time
+                  var y = engine.queue.size;
+
+                  series.addPoint([x, y], true, true);
+                });
+              }
+            }
+          },
+          title: {
+            text: 'Suite Queue'
+          },
+          xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 100
+          },
+          yAxis: {
+            title: {
+              text: ''
+            },
+            min: 0,
+            plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#808080'
+            }]
+          },
+          tooltip: {
+            formatter: function() {
+              return '<b>'+ this.series.name +'</b><br/>'+
+              Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+              Highcharts.numberFormat(this.y, 0);
+            }
+          },
+          plotOptions: {
+            spline: {
+              lineWidth: 2,
+              states: {
+                hover: {
+                  lineWidth: 3
+                }
+              },
+              marker: {
+                enabled: false
+              }
+            }
+          },
+          legend: {
+            enabled: false
+          },
+          exporting: {
+            enabled: false
+          },
+          series: [{
+            name: 'Suite Queue Size',
+            data: (function() {
+              //Generate an array of data points that will be initialized to 0
+              //and will eventually drop off after additional points replace
+              //them.
+
+              var data = [],
+                  time = (new Date()).getTime(),
+                  i;
+
+              for (i = -49; i <= 0; i++) {
+                data.push({
+                  x: time + i * 1000,
+                  y: 0
+                });
+              }
+              return data;
+            })()
+          }]
+        });
+      });
+    });
+  </script>
+
+  <script type="text/javascript">
+    $(function () {
+      $(document).ready(function() {
+        $('#machineCount').highcharts({
+          chart: {
+            type: 'spline',
+            animation: Highcharts.svg, //Don't animate in old IE
+            marginRight: 10,
+            events: {
+              load: function() {
+                var series = this.series[0];
+
+                //Updates the chart every time new data is sent from
+                //the server.
+
+                sse.addDataReceivedListener(function(engine) {
+                  //Filter any data that's been received that doesn't
+                  //have what we're looking for.
+                  if (typeof(engine.machines) === 'undefined')
+                    return;
+
+                  //If we got this far, then the incoming data is in a
+                  //form we can digest.
+
+                  var x = (new Date()).getTime(); //Current time
+                  var y = engine.machines.count;
+
+                  series.addPoint([x, y], true, true);
+                });
+              }
+            }
+          },
+          title: {
+            text: 'Machine Count'
+          },
+          xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 100
+          },
+          yAxis: {
+            title: {
+              text: ''
+            },
+            min: 0,
+            plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#808080'
+            }]
+          },
+          tooltip: {
+            formatter: function() {
+              return '<b>'+ this.series.name +'</b><br/>'+
+              Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+              Highcharts.numberFormat(this.y, 0);
+            }
+          },
+          plotOptions: {
+            spline: {
+              lineWidth: 2,
+              states: {
+                hover: {
+                  lineWidth: 3
+                }
+              },
+              marker: {
+                enabled: false
+              }
+            }
+          },
+          legend: {
+            enabled: false
+          },
+          exporting: {
+            enabled: false
+          },
+          series: [{
+            name: 'Machine Count',
+            data: (function() {
+              //Generate an array of data points that will be initialized to 0
+              //and will eventually drop off after additional points replace
+              //them.
+
+              var data = [],
+                  time = (new Date()).getTime(),
+                  i;
+
+              for (i = -49; i <= 0; i++) {
+                data.push({
+                  x: time + i * 1000,
+                  y: 0
+                });
+              }
+              return data;
+            })()
+          }]
+        });
+      });
+    });
+  </script>
+
+}

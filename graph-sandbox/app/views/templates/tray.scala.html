@@ -1,0 +1,11 @@
+@(title:String = "", success:Seq[String] = Seq(), error:Seq[String] = Seq())(tray:Html)(content:Html)(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@template_tray = {
+  <div class="tray">
+    <div class="inner">
+      @tray
+    </div>
+  </div>
+}
+
+@templates.charts(title, success, error, template_tray)(content)

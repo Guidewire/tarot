@@ -1,0 +1,11 @@
+!.gitignore
+
+/untitled/
+/logs/
+
+project/target/
+target/
+
+.idea/
+.idea_modules/
+*.iml

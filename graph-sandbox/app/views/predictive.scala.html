@@ -1,0 +1,9 @@
+@(title:String = "Predictive Resource Allocation", success:Seq[String] = Seq(), error:Seq[String] = Seq())(implicit user:Option[App.View.Account.Details], loginForm:Form[(String, String)], baseUri:App.View.AbsoluteUri, flash:Flash, request:RequestHeader)
+
+@templates.content(title, success, error) {
+  <h2>Predictive Resource Allocation</h2>
+  <p>
+    Tarot periodically examines your environment looking for ways to optimize resource allocation
+    in your on-premise and/or public test cloud.
+  </p>
+}
